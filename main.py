@@ -69,9 +69,10 @@ def format_keyboard(str_day,date,message): #'Пн' и '6.10'
 def schedule(massive,day): #day это дата (НЕ строка)
 	day_of_week = day.weekday()
 	days = {0:'Понедельник',1: 'Вторник',2: 'Среда',3: 'Четверг',4: 'Пятница',5: 'Суббота', 6: 'Воскресенье'}
-	s = days[day_of_week] + ' ' + time_StrDM_fromData(day) + '\n' + '\n'
+
+	s = "📌" + days[day_of_week] + ' ' + time_StrDM_fromData(day) + "📌" + '\n' + '\n'
 	for lesson in massive:
-		s+=(lesson[2] + '\n' + lesson[-1] + ' по дисциплине: ' + lesson[0] + '\n' + 'Преподаватель: ' + lesson[1] + '\n' + 'Аудитория и корпус/online: ' + lesson[-3] + ' ' + lesson[-2]) + '\n' + '\n'
+		s+=(emoji.emojize(":alarm_clock:") + lesson[2] + '\n' + emoji.emojize(":books:") + lesson[-1] + ' по дисциплине: ' + lesson[0] + '\n' + emoji.emojize(":man_teacher:") + 'Преподаватель: ' + lesson[1] + '\n' + emoji.emojize(":school:") + 'Аудитория и корпус/online: ' + lesson[-3] + ' ' + lesson[-2]) + '\n' + '\n'
 	return s
 
 def make_keyboard_markup_2(message):
@@ -111,6 +112,45 @@ def choose_group(message):
 	bot.send_message(message.chat.id, 'Привет, студент! Ты должен выбрать свою группу из потока 25КНТ', reply_markup=markup_1)
 	bot.register_next_step_handler(message, on_click)
 
+def keyboard_teachers(message):
+	bot.delete_message(message.chat.id, message.message_id)  # удаляем прошлый запрос
+	markup = types.InlineKeyboardMarkup()
+	# btn_2 = types.InlineKeyboardButton("Косульников Д.Д.", callback_data="Косульников Д.Д.")!
+	# btn_2 = types.InlineKeyboardButton("Константинова Т.Н.", callback_data="Константинова Т.Н.")!
+	# btn_2 = types.InlineKeyboardButton("Кочеров С.Н.", callback_data="Кочеров С.Н.")!
+
+	btn_1 = types.InlineKeyboardButton("Беспалов П.А.", callback_data="Беспалов П.А.")
+	btn_4 = types.InlineKeyboardButton("Городнова А.А.", callback_data="Городнова А.А.")
+	btn_7 = types.InlineKeyboardButton("Касьянов Н.Ю.", callback_data="Касьянов Н.Ю.")
+	btn_10 = types.InlineKeyboardButton("Климов А.", callback_data="Климов А.")
+	btn_13 = types.InlineKeyboardButton("Логвинова К.В.", callback_data="Логвинова К.В.")
+
+	btn_2 = types.InlineKeyboardButton("Лупанова Е.А.", callback_data="Лупанова Е.А.")
+	btn_5 = types.InlineKeyboardButton("Малышев Д.С.", callback_data="Малышев Д.С.")
+	btn_8 = types.InlineKeyboardButton("Марьевичев Н.", callback_data="Марьевичев Н.")
+	btn_11 = types.InlineKeyboardButton("Пеплин Ф.С.", callback_data="Пеплин Ф.С.")
+	btn_14 = types.InlineKeyboardButton("Полонецкая Н.А.", callback_data="Полонецкая Н.А.")
+
+	btn_3 = types.InlineKeyboardButton("Савина О.Н.", callback_data="Савина О.Н.")
+	btn_6 = types.InlineKeyboardButton("Талецкий Д.С.", callback_data="Талецкий Д.С.")
+	btn_9 = types.InlineKeyboardButton("Улитин И.Б.", callback_data="Улитин И.Б.")
+	btn_12 = types.InlineKeyboardButton("Чистяков В.В.", callback_data="Чистяков В.В.")
+	btn_15 = types.InlineKeyboardButton("Чистякова С.А.", callback_data="Чистякова С.А.")
+
+	btn_16 = types.InlineKeyboardButton("Шапошников В.Е.", callback_data="Шапошников В.Е.")
+	markup.row(btn_1, btn_2, btn_3)
+	markup.row(btn_4, btn_5, btn_6)
+	markup.row(btn_7, btn_8, btn_9)
+	markup.row(btn_10, btn_11, btn_12)
+	markup.row(btn_13, btn_14, btn_15)
+	markup.row(btn_16)
+	return markup
+
+@bot.message_handler(commands=['teachers'])
+def teachers(message):
+	markup = keyboard_teachers(message)
+	bot.send_message(message.chat.id, 'Выберите учителя: ', reply_markup=markup)
+
 @bot.message_handler(commands=['start'])
 def start(message):
 	db = get_all_from_bd(message.chat.id)
@@ -146,7 +186,7 @@ def on_click(message):
 
 
 #C:\Users\Надя\PycharmProjects\nadya_bot\users_id_k
-def extra_nigth(day,message):
+def no_less(day,message):
 	# global k
 	k = koaf(message)
 	days = {'Пн': 'Понедельник', 'Вт': 'Вторник', 'Ср': 'Среда', 'Чт': 'Четверг', 'Пт': 'Пятница', 'Сб': 'Суббота', 'Вс': 'Воскресенье'}
@@ -165,7 +205,7 @@ def buttons_mn_sat(day,callback): #day это 'Пн' или 'Вт' и тп..
 	except:
 		# bot.send_message(callback.message.chat.id, f'{date}, {gr(callback.message)}')  # !!!!!проверка
 		#2025-10-17 16:19:27.347538, 7
-		bot.send_message(callback.message.chat.id, extra_nigth(day,callback.message),reply_markup=markup_2)
+		bot.send_message(callback.message.chat.id, no_less(day,callback.message),reply_markup=markup_2)
 # print(database.get_schedule_for_date('17.10',7))
 # Обработчик callback_query (нажатий на кнопки)
 @bot.callback_query_handler(func=lambda callback: True)
@@ -202,10 +242,15 @@ def callback_query(callback):
 		if callback.data == day:
 			buttons_mn_sat(day,callback)
 
-	if callback.data == 'Чт' or callback.data == 'Сб':
+	if callback.data == 'Чт':
 		bot.delete_message(callback.message.chat.id, callback.message.message_id)  # удаляем прошлый запрос
 		markup = make_keyboard_markup_2(callback.message)
-		bot.send_message(callback.message.chat.id, 'Английский язык -> см. расписание \n https://docs.google.com/spreadsheets/d/1RB9AWtrYm6Y9m8NSy6On7Zk3byws8RonAGBqeneSxOo/edit?gid=23993546#gid=23993546', reply_markup=markup)
+		bot.send_message(callback.message.chat.id, "📌" + 'Чт' + ' ' + time_keyboard('Чт',koaf(callback.message)) + "📌" + '\n' + 'Английский язык -> см. расписание \n https://docs.google.com/spreadsheets/d/1RB9AWtrYm6Y9m8NSy6On7Zk3byws8RonAGBqeneSxOo/edit?gid=23993546#gid=23993546', reply_markup=markup)
+
+	if callback.data == 'Сб':
+		bot.delete_message(callback.message.chat.id, callback.message.message_id)  # удаляем прошлый запрос
+		markup = make_keyboard_markup_2(callback.message)
+		bot.send_message(callback.message.chat.id, "📌" + 'Сб' + ' ' + time_keyboard('Сб',koaf(callback.message)) + "📌" + '\n' + 'Английский язык -> см. расписание \n https://docs.google.com/spreadsheets/d/1RB9AWtrYm6Y9m8NSy6On7Zk3byws8RonAGBqeneSxOo/edit?gid=23993546#gid=23993546', reply_markup=markup)
 
 	first = 'назад'
 	second = 'вперёд'
@@ -239,4 +284,103 @@ def callback_query(callback):
 		else:
 			bot.send_message(callback.message.chat.id, f'Расписание на эту неделю', reply_markup=next_markup)
 
+	teachers = ["Климов А.", "Улитин И.Б.", "Касьянов Н.Ю.",
+				"Малышев Д.С.", "Беспалов П.А.",
+				"Чистякова С.А.", "Савина О.Н.", "Чистяков В.В.", "Городнова А.А.", "Пеплин Ф.С.",
+				"Талецкий Д.С.", "Полонецкая Н.А.",
+				"Марьевичев Н.", "Шапошников В.Е.", "Логвинова К.В.", "Лупанова Е.А."]
+	for teacher in teachers:
+		if callback.data == teacher:
+			s = '👨🏼‍🏫' + teacher + '\n' + find_teacher(teacher,callback.message)
+			makrup_TEACHER = keyboard_teachers(callback.message)
+			bot.send_message(callback.message.chat.id, s, reply_markup=makrup_TEACHER)
+
+def find_teacher(teacher,message):
+	s = ''
+	count1 = 0
+	week = ['Пн', 'Вт','Ср','Чт','Пт','Сб']
+	for week_day in week:
+		g = gr(message)
+		day = time_keyboard(week_day, 0)
+		w = '\n' + "📌" + week_day + ' ' + day + '\n'
+		a = database.get_info_from_teacher(day,teacher)
+		# count1 = 0
+		count3 = 0 #сколько пропускаем групп
+		if len(a)==0:
+			w+='Нет занятий у 25КНТ в этот день\n'
+			s += w
+		else:
+			w += ('В ' + a[0][0] + ' занятие у ' + str(a[0][-1]) + ' группы в аудитории ' + a[0][1] + '(' + a[0][2] + ')' + '\n')
+			repeat_gr = str(a[0][-1]) + ' '
+			fl = 0
+			for i in range(1,len(a)):
+				if a[i][0] in w:
+					repeat_gr+=str(a[i][-1]) + ' '
+					# count1 += 1
+					count3+=1
+					fl = 1
+					if i==(len(a)-1):
+						w = w.replace(f'занятие у {str(a[i - count3][-1])} группы', f'занятие у {repeat_gr}групп',1)
+				else:
+					if fl==1:#только что пропустили
+						w = w.replace(f'занятие у {str(a[i-count3-1][-1])} группы',f'занятие у {repeat_gr}групп',1)
+						repeat_gr = str(a[i][-1]) + ' '
+						count3 = 0
+						w += ('В ' + a[i][0] + ' занятие у ' + str(a[i][-1]) + ' группы в аудитории ' + a[i][1] + '(' + a[i][2] + ')' + '\n')
+						# count1 += 1
+						fl = 0
+
+					else: #давно пропускали
+						repeat_gr = str(a[i][-1]) + ' '
+						count3 = 0
+						w += ('В ' + a[i][0] + ' занятие у ' + str(a[i][-1]) + ' группы в аудитории ' + a[i][1] + '(' + a[i][2] + ')' + '\n')
+						# count1+=1
+			s+=w
+	return s
+
 bot.infinity_polling()
+
+# @bot.message_handler(commands=['site'])
+# # content_types=['photo'] принимать функция может сообщения разных типов
+# def main(message):
+# 	webbrowser.open('https://www.youtube.com/watch?v=-l_CYgBj4IE&list=PL0lO_mIqDDFUev1gp9yEwmwcy8SicqKbt&index=3')
+# @bot.message_handler(commands=['help'])
+# def main(message):
+# 	# bot.reply_to(message, "	<b>How</b> are you doing?",parse_mode='html')
+# 	bot.send_message(message.chat.id, 'Прив')
+#
+# 	markup = types.InlineKeyboardMarkup()
+# 	btn1 = types.InlineKeyboardButton('Перейти на сайт', url='https://www.youtube.com/watch?v=-l_CYgBj4IE&list=PL0lO_mIqDDFUev1gp9yEwmwcy8SicqKbt&index=3')
+# 	markup.row(btn1)
+# 	btn2 = types.InlineKeyboardButton('Раз', callback_data='раз')
+# 	btn3 = types.InlineKeyboardButton('Два', callback_data='два')
+# 	markup.row(btn2,btn3)
+# 	# markup.add(кнопки в строчку)
+# 	bot.reply_to(message, 'вот оно',reply_markup=markup)
+#
+# @bot.callback_query_handler(func = lambda callback:True)
+# def callback_message(callback):
+# 	if callback.data == 'раз':
+# 		bot.delete_message(callback.message.chat.id, callback.message.message_id-1)
+# 	elif callback.data == 'два':
+# 		bot.edit_message_text('edit',callback.message.chat.id, callback.message.message_id)
+#
+# @bot.message_handler()
+# def talk(message):
+# 	if message.text.lower()=='привет':
+# 		bot.send_message(message.chat.id,'Добро пожаловать в бот')
+# 	else:
+# 		bot.reply_to(message, 'Не понимаю тебя')
+# @bot.message_handler(func=lambda message: True)
+# def echo_all(message):
+# 	bot.reply_to(message, message.text)
+
+
+# now = today.strftime("%d-%m")
+
+# now = datetime.today()
+# now = datetime.strftime(now,"%d.%m")
+# print(now)
+
+# print(schedule(a))
+# print(emoji.emojize("Python is :thumbs_up:"))
